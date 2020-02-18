@@ -6,7 +6,7 @@ const ejs = require("ejs");
 const _ = require('lodash');
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/post", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://Blog:Pamnanichotu!8@blog-8uwpu.mongodb.net/test?retryWrites=true&w=majority", {useNewUrlParser: true});
 
 const postsSchema = new mongoose.Schema ({
   title: {
@@ -36,10 +36,17 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
-
-app.listen(4000, function() {
-  console.log("Server started on port 4000");
+let port = process.env.PORT;
+if (port == null || port == "") {
+	port = 3000;
+}
+app.listen(port, function() {
+	console.log("Server started successfully.");
 });
+
+// app.listen(4000, function() {
+//   console.log("Server started on port 4000");
+// });
 
 app.get("/", function(req, res){
   Post.find({}, function(err, posts){
