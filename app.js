@@ -21,6 +21,14 @@ const postsSchema = new mongoose.Schema ({
 
 const Post = mongoose.model("Post", postsSchema);
 
+const userSchema = new mongoose.Schema ({
+  email: String,
+  password: String
+});
+
+const User = mongoose.model("User", userSchema);
+
+
 const homeStartingContent = new Post({
   title: "Home",
   content: "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing."
@@ -67,13 +75,73 @@ app.get("/", function(req, res){
   });
 });
 
+app.get("/blog", function(req, res){
+  Post.find({}, function(err, posts){
+    if (posts.length === 0){
+      Post.insertMany(defaultPosts, function(err){
+        if (err){
+          console.log(err);
+        } else {
+          console.log("Default Posts added");
+        }
+      });
+    }
+    if (err){
+      console.log(err);
+    } else {
+      res.render('blog', {posts: posts});
+    }
+  });
+});
+
 app.get("/about", function(req, res){
   res.render('about', {aboutContent: aboutContent});
 });
 
+app.get("/login", function(req, res){
+  res.render('login');
+});
+app.get("/register", function(req, res){
+  res.render('register');
+});
 app.get("/contact", function(req, res){
   res.render('contact', {contactContent: contactContent});
 });
+
+
+app.post("/register",function(req,res){
+  const newUser = new User({
+    email: req.body.username,
+    password: req.body.password
+  });
+  newUser.save(function(err){
+    if (err) {
+      console.log(err);
+    } else{
+      res.redirect("/blog");
+    }
+  });
+});
+
+app.post("/login",function(req,res){
+  const username=req.body.username;
+  const password=req.body.password;
+
+  User.findOne({email: username}, function(err, foundUser){
+    if(err) {
+      console.log(err);
+    }
+    else{
+      if(foundUser){
+        if (foundUser.password=== password){
+          res.redirect("/blog");
+        }
+      }
+    }
+  });
+});
+
+
 
 app.get("/compose", function(req, res){
   res.render('compose');
