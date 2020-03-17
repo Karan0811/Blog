@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const _ = require('lodash');
 const mongoose = require("mongoose");
+const encrypt = require("mongoose-encryption");
 
 mongoose.connect("mongodb+srv://Blog:Pamnanichotu!8@blog-8uwpu.mongodb.net/test?retryWrites=true&w=majority", {useNewUrlParser: true});
 
@@ -25,6 +26,9 @@ const userSchema = new mongoose.Schema ({
   email: String,
   password: String
 });
+
+const secret = "Thisisourlittlesecret.";
+userSchema.plugin(encrypt, { secret : secret, encryptedFields: ["password"]});
 
 const User = mongoose.model("User", userSchema);
 
